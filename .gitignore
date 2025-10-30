@@ -1,0 +1,8 @@
+*.o
+*.e
+*.ppm
+build
+*_ispc.h
+compile_commands.json
+.cache
+.vscode
