@@ -21,8 +21,8 @@ DEBUGFLAGS= \
 
 .PHONY: all
 
-fractal.e: fractal.o
-	$(CC) fractal.o -o fractal.e
+fractal.e: tasksys.o complex_ispc.o fractal_ispc.o fractal_serial.o fractal.o
+	$(CC) tasksys.o complex_ispc.o fractal_ispc.o fractal_serial.o fractal.o -o fractal.e
 
 noise.e: noise_ispc.o noise_serial.o noise.o
 	$(CC) noise.o noise_serial.o noise_ispc.o -o noise.e
@@ -35,4 +35,4 @@ noise.e: noise_ispc.o noise_serial.o noise.o
 
 
 clean:
-	rm *.o *.e
+	rm *.o *.e *_ispc.h

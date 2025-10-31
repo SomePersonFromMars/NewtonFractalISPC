@@ -1,15 +1,12 @@
+#include <cstdio>
+#include <algorithm>
 #include <complex>
 #include <cmath>
-#include "timing.h"
-#include <cstdlib>
-#include <string.h>
-#include <algorithm>
+
 #include "fractal_ispc.h"
 #include "settings.h"
 using namespace std;
 using namespace ispc;
-
-void fractal_serial(float x0, float y0, float x1, float y1, int width, int height, Color output[], complex<float> *roots, size_t n);
 
 complex<float>* rootsOfF(int n) {
     complex<float> *roots = new complex<float>[n];
@@ -42,28 +39,24 @@ static void writePPM(Color *buf, int width, int height, const char *fn) {
     fclose(fp);
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char **argv) {
+    int n = 1;
+    if (argc <= 1) {
+        fprintf(stderr,
+        "Usage: ./fractal.e N\n"
+        "\tN - positive integer defining the function f(z) = z^N - 1\n");
+        return 1;
+    } else {
+        n = atoi(argv[1]);
+    }
+
     Color *buf = new Color[WIDTH * HEIGHT];
-    auto roots = rootsOfF(N);
+    auto roots = rootsOfF(n);
 
-    reset_and_start_timer();
-    fractal_ispc(X0, Y0, X1, Y1, WIDTH, HEIGHT, buf, reinterpret_cast<Complex*>(roots), N);
-    double ispTime = get_elapsed_mcycles();
-
-    printf("[fractal ispc]:\t\t\t[%.3f] million cycles\n", ispTime);
+    printf("Started the parallel Newton Fractal generation...\n");
+    fractal_ispc(X0, Y0, X1, Y1, WIDTH, HEIGHT, buf, reinterpret_cast<Complex*>(roots), n);
+    printf("Generation finished. Writing to file fractal-ispc.ppm\n");
     writePPM(buf, WIDTH, HEIGHT, "fractal-ispc.ppm");
-
-    for (unsigned int i = 0; i < WIDTH * HEIGHT; ++i)
-        buf[i] = {0, 0, 0};
-
-    reset_and_start_timer();
-    fractal_serial(X0, Y0, X1, Y1, WIDTH, HEIGHT, buf, roots, N);
-    double serialTime = get_elapsed_mcycles();
-
-    printf("[fractal serial]:\t\t[%.3f] million cycles\n", serialTime);
-    writePPM(buf, WIDTH, HEIGHT, "fractal-serial.ppm");
-
-    printf("\t\t\t\t(%.2fx speedup from ISPC)\n", serialTime / ispTime);
 
     delete[] buf;
     delete[] roots;

@@ -1,0 +1,16 @@
+#ifndef COMPLEX_ISPH
+#define COMPLEX_ISPH
+
+struct Complex {  
+    float re;  
+    float im;  
+};  
+
+Complex operator+(Complex a, Complex b);  
+Complex operator-(Complex a, Complex b);  
+Complex operator*(Complex a, Complex b);  
+Complex operator/(Complex a, Complex b);  
+Complex polar(float r, float theta);
+Complex powUniformExp(Complex z, uniform int n);
+
+#endif
