@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <complex>
 #include <cmath>
+#include <chrono>
 
 #include "fractal_ispc.h"
 #include "settings.h"
@@ -53,10 +54,18 @@ int main(int argc, char **argv) {
     Color *buf = new Color[WIDTH * HEIGHT];
     auto roots = rootsOfF(n);
 
-    printf("Started the parallel Newton Fractal generation...\n");
+    printf("Newton Fractal generator.\n");
+    printf("f(z) = z^%d - 1\n", n);
+    printf("WIDTH = %d\n", WIDTH);
+    printf("WIDTH = %d\n", HEIGHT);
+    printf("MAX_ITERATIONS = %d\n", MAX_ITERATIONS);
+    printf("Started the parallel generation via ISPC...\n");
+    auto start = std::chrono::steady_clock::now();
     fractal_ispc(X0, Y0, X1, Y1, WIDTH, HEIGHT, buf, reinterpret_cast<Complex*>(roots), n);
-    printf("Generation finished. Writing to file fractal-ispc.ppm\n");
-    writePPM(buf, WIDTH, HEIGHT, "fractal-ispc.ppm");
+    auto end = std::chrono::steady_clock::now();
+    auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    printf("Generation finished in %lld ms. Writing to file " OUTPUT_FILE "\n", static_cast<long long>(elapsed_ms));
+    writePPM(buf, WIDTH, HEIGHT, OUTPUT_FILE);
 
     delete[] buf;
     delete[] roots;

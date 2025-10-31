@@ -2,6 +2,7 @@
 #define SETTINGS_H
 
 // Settings
+#define OUTPUT_FILE "newton-fractal-ispc.ppm"
 #define WIDTH 2048
 #define HEIGHT 2048
 #define X0 -2.5f
