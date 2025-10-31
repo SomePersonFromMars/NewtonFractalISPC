@@ -5,34 +5,20 @@ CXXFLAGS= \
 	-Wall \
 	-Wshadow \
 	-Wextra \
-	-pedantic \
-	# -O3 \
+	-pedantic
 
-DEBUGFLAGS= \
-	-g3 \
-	-D_GLIBCXX_DEBUG \
-	-D_GLIBCXX_DEBUG_PEDANTIC \
-	-fsanitize=address,undefined,leak \
-	-DDEBUG \
-	-DDEBUGPRINT \
-	# -g \
-	# -fsanitize=float-divide-by-zero \
-	# -fsanitize=float-cast-overflow \
+fractal.e: fractal.o fractal_ispc.o complex_ispc.o tasksys.o
+	$(CC) fractal.o fractal_ispc.o complex_ispc.o tasksys.o -o fractal.e
 
-.PHONY: all
-
-fractal.e: tasksys.o complex_ispc.o fractal_ispc.o fractal_serial.o fractal.o
-	$(CC) tasksys.o complex_ispc.o fractal_ispc.o fractal_serial.o fractal.o -o fractal.e
-
-noise.e: noise_ispc.o noise_serial.o noise.o
-	$(CC) noise.o noise_serial.o noise_ispc.o -o noise.e
+fractal.o: fractal_ispc.h settings.h
+fractal_ispc.h: fractal_ispc.o
 
 %.o: %.cpp
-	$(CC) $*.cpp -c -o $*.o
+	$(CC) $(CXXFLAGS) $*.cpp -c -o $*.o
 
 %_ispc.o: %.ispc
 	ispc --target=host --pic $*.ispc -o $*_ispc.o -h $*_ispc.h
 
 
 clean:
-	rm *.o *.e *_ispc.h
+	rm *.o *.e *_ispc.h *.ppm compile_commands.json
