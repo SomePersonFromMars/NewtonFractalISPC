@@ -1,5 +1,7 @@
-CC:=g++
-CC:=bear --append -- $(CC)
+CC := g++
+ifeq ($(BEAR),yes)
+    CC := bear --append -- $(CC)
+endif
 
 CXXFLAGS= \
 	-Wall \
